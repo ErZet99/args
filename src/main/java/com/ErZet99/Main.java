@@ -4,7 +4,11 @@ import com.ErZet99.Args.Args;
 
 public class Main {
     public static void main(String[] args) {
-        Args arg = new Args("l", args);
-        boolean logging = arg.getBoolean('l');
+        try {
+            Args arg = new Args("l", args);
+            boolean logging = arg.getBoolean('l');
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
