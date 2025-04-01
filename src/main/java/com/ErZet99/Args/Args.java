@@ -171,11 +171,13 @@ public class Args {
     }
 
     private String unexpectedArgumentMessage() {
-        StringBuffer message = new StringBuffer("Argument(s) -");
+        StringBuffer message = new StringBuffer("Argument(s) ");
         for (char c : unexpectedArguments) {
+            message.append("-");
             message.append(c);
+            message.append(" ");
         }
-        message.append(" unexpected.");
+        message.append("unexpected.");
         return message.toString();
     }
 
