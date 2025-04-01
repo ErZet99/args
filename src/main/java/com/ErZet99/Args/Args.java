@@ -225,12 +225,20 @@ public class Args {
         return booleanArgs.get(arg);
     }
 
+    public String getString(char arg) {
+        return blankIfNull(stringArgs.get(arg));
+    }
+
+    public int getInt(char arg) {
+        return zeroIfNull(intArgs.get(arg));
+    }
+
     private boolean falseIfNull(Boolean b) {
         return b == null ? false : b;
     }
 
-    public String getString(char arg) {
-        return blankIfNull(stringArgs.get(arg));
+    private int zeroIfNull(Integer i) {
+        return i == null ? 0 : i;
     }
 
     private String blankIfNull(String s) {

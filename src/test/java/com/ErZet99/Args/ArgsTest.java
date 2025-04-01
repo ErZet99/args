@@ -81,5 +81,11 @@ public class ArgsTest {
         assertTrue(args.has('y'));
     }
 
-
+    @Test
+    public void testSimpleIntPresent() throws Exception {
+        Args args = new Args("x#", new String[]{"-x", "42"});
+        assertEquals(1, args.cardinality());
+        assertTrue(args.has('x'));
+        assertEquals(42, args.getInt('x'));
+    }
 }
