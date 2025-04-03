@@ -41,7 +41,7 @@ public class ArgsTest {
     }
 
     @Test
-    public void testInvalidArgumentFormat() throws Exception {
+    public void testInvalidStringFormat() throws Exception {
         try {
             Args args = new Args("f~", new String[]{});
             fail("Args constructor should have thrown exception");
@@ -87,5 +87,19 @@ public class ArgsTest {
         assertEquals(1, args.cardinality());
         assertTrue(args.has('x'));
         assertEquals(42, args.getInt('x'));
+    }
+
+    @Test
+    public void testInvalidInteger() throws Exception {
+        Args args = new Args("x#", new String[]{"-x", "Forty two"});
+        assertFalse(args.isValid());
+        assertEquals("Argument -x expects an integer but was 'Forty two'.", args.errorMessage());
+    }
+
+    @Test
+    public void testMissingInteger() throws Exception {
+        Args args = new Args("x#", new String[]{"-x"});
+        assertFalse(args.isValid());
+        assertEquals("Could not find integer parameter for -x.", args.errorMessage());
     }
 }
