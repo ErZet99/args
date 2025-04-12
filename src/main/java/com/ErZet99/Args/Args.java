@@ -8,9 +8,9 @@ public class Args {
      private String[] args;
      private boolean valid = true;
      private Set<Character> unexpectedArguments = new TreeSet<Character>();
-     private Map<Character, Boolean> booleanArgs = new HashMap<Character, Boolean>();
-     private Map<Character, String> stringArgs = new HashMap<Character, String>();
-     private Map<Character, Integer> intArgs = new HashMap<Character, Integer>();
+     private Map<Character, ArgumentMarshaler> booleanArgs = new HashMap<Character, ArgumentMarshaler>();
+     private Map<Character, ArgumentMarshaler> stringArgs = new HashMap<Character, ArgumentMarshaler>();
+     private Map<Character, ArgumentMarshaler> intArgs = new HashMap<Character, ArgumentMarshaler>();
      private Set<Character> argsFound = new HashSet<Character>();
      private int currentArgument;
      private char errorArgumentId = '\0';
@@ -70,15 +70,15 @@ public class Args {
      }
 
     private void parseBooleanSchemaElement(char elementId) {
-        booleanArgs.put(elementId, false);
+        booleanArgs.put(elementId, new BooleanArgumentMarshaler());
     }
 
     private void parseIntegerSchemaElement(char elementId) {
-        intArgs.put(elementId, 0);
+        intArgs.put(elementId, new IntegerArgumentMarshaler());
     }
 
      private void parseStringSchemaElement(char elementId) {
-         stringArgs.put(elementId, "");
+         stringArgs.put(elementId, new StringArgumentMarshaler());
      }
 
      private boolean isStringSchemaElement(String elementTail) {
@@ -141,7 +141,7 @@ public class Args {
         String parameter = null;
         try {
             parameter = args[currentArgument];
-            intArgs.put(argChar, Integer.parseInt(parameter));
+            intArgs.get(argChar).setInteger(Integer.parseInt(parameter));
         } catch (ArrayIndexOutOfBoundsException e) {
             valid = false;
             errorArgumentId = argChar;
@@ -158,7 +158,7 @@ public class Args {
     private void setStringArg(char argChar) throws ArgsException {
         currentArgument++;
         try {
-            stringArgs.put(argChar, args[currentArgument]);
+            stringArgs.get(argChar).setString(args[currentArgument]);
         } catch(ArrayIndexOutOfBoundsException e) {
             valid = false;
             errorArgumentId = argChar;
@@ -180,7 +180,7 @@ public class Args {
     }
 
     private void setBooleanArg(char argChar, boolean value) {
-        booleanArgs.put(argChar, value);
+        booleanArgs.get(argChar).set("true");
     }
 
     public int cardinality() {
@@ -222,15 +222,18 @@ public class Args {
     }
 
     public boolean getBoolean(char arg) {
-        return booleanArgs.get(arg);
+         Args.ArgumentMarshaler am = booleanArgs.get(arg);
+        return am != null && (Boolean)am.get();
     }
 
     public String getString(char arg) {
-        return blankIfNull(stringArgs.get(arg));
+        Args.ArgumentMarshaler am = stringArgs.get(arg);
+        return am == null ? "" : am.getString();
     }
 
     public int getInt(char arg) {
-        return zeroIfNull(intArgs.get(arg));
+        Args.ArgumentMarshaler am = intArgs.get(arg);
+        return am == null ? 0 : am.getInteger();
     }
 
     private boolean falseIfNull(Boolean b) {
@@ -255,4 +258,57 @@ public class Args {
 
     private class ArgsException extends Exception {
     }
+
+    private abstract class ArgumentMarshaler {
+        protected boolean booleanValue = false;
+        protected String stringValue;
+        protected int integerValue;
+
+        public void setString(String value) {
+            stringValue = value;
+        }
+
+        public String getString() {
+            return stringValue == null ? "" : stringValue;
+        }
+
+        public void setInteger(int i) {
+            integerValue = i;
+        }
+
+        public Integer getInteger() {
+            return integerValue;
+        }
+
+        public abstract void set(String s);
+        public abstract Object get();
+    }
+
+    private class BooleanArgumentMarshaler extends ArgumentMarshaler {
+         public void set(String s) {
+             booleanValue = true;
+         }
+
+         public Object get() {
+             return booleanValue;
+         }
+    }
+
+    private class StringArgumentMarshaler extends ArgumentMarshaler {
+         public void set(String s) {
+         }
+         public Object get() {
+             return stringValue;
+         }
+    }
+
+    private class IntegerArgumentMarshaler extends ArgumentMarshaler {
+         public void set(String s) {
+         }
+
+         public Object get() {
+             return integerValue;
+         }
+    }
+
 }
