@@ -35,7 +35,7 @@ public class ArgsTest {
         try {
             Args args = new Args("*", new String[]{});
             fail("Args constructor should have thrown exception");
-        } catch (ParseException e) {
+        } catch (ArgsException e) {
             assertEquals("Bad character: * in Args format: *", e.getMessage());
         }
     }
@@ -45,7 +45,7 @@ public class ArgsTest {
         try {
             Args args = new Args("f~", new String[]{});
             fail("Args constructor should have thrown exception");
-        } catch (ParseException e) {
+        } catch (ArgsException e) {
             assertEquals("Argument: f has invalid format: ~", e.getMessage());
         }
     }
